@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+    <!-- Webpage Title -->
+    <title>Home | SWEETER</title>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <!-- Font Awesome CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+    <link href="{{ url_for('static', filename='reviews.css') }}" rel="stylesheet">
+    <script src="../static/reviews.js"></script>
+
+
+</head>
+<body>
+<nav class="navbar is-fixed-top is-white" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="/">
+            <strong class="is-sparta"
+                    style="font-family: 'Stylish', sans-serif;font-size: larger;">공부혜윰</strong>
+        </a>
+        <a class="button level-item has-text-centered is-sparta is-outlined" aria-label="logout"
+           onclick="sign_out()">
+            로그아웃&nbsp;&nbsp;&nbsp;<span class="icon is-small"><i class="fa fa-sign-out"
+                                                                 aria-hidden="true"></i></span>
+        </a>
+        <a href="/mypage">마이페이지</a>
+    </div>
+</nav>
+<div id="wrap">
+    <div id="post-box" class="form-post">
+        <div>
+            <div class="form-group">
+                <label for="post-url">아티클 URL</label>
+                <input id="post-url" class="form-control" placeholder="">
+            </div>
+            <div class="form-group">
+                <label for="post-comment">간단 코멘트</label>
+                <textarea id="post-comment" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="studyOption" id="inlineRadio1" value="Spring">
+                <label class="form-check-label" for="inlineRadio1">Spring</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="studyOption" id="inlineRadio2" value="Node.js">
+                <label class="form-check-label" for="inlineRadio2">Node.js</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="studyOption" id="inlineRadio3" value="React">
+                <label class="form-check-label" for="inlineRadio3">React</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="studyOption" id="inlineRadio4" value="Etc">
+                <label class="form-check-label" for="inlineRadio4">Etc</label>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="postArticle()">포스팅하기</button>
+        </div>
+
+
+    </div>
+    <div class="section">
+        <p>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="studyOption" id="inlineCheckbox1" value="Spring">
+            <label class="form-check-label" for="inlineCheckbox1">Spring</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="studyOption" id="inlineCheckbox2" value="Node.js">
+            <label class="form-check-label" for="inlineCheckbox2">Node.js</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="studyOption" id="inlineCheckbox3" value="React">
+            <label class="form-check-label" for="inlineCheckbox3">React</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="studyOption" id="inlineCheckbox4" value="Etc">
+            <label class="form-check-label" for="inlineCheckbox4">Etc</label>
+        </div>
+        </p>
+    </div>
+    <div id="cards-box" class="card-columns">
+        {% for review in review_list %}
+        <div class="card">
+
+            <img class="card-img-top"
+                 src={{ review['image'] }}
+            alt="Card image cap">
+            <div class="card-body">
+                <a target="_blank" href={{ review['url'] }} class="card-title">{{ review['title'] }}</a>
+                <p class="card-text">{{ review['desc'] }}</p>
+                <p class="card-text comment">{{ review['comment'] }}</p>
+                <p class="card-text comment"><a href="#"
+                                                onclick="likeReview(  {{  review['special_number']  }}  )">좋아요</a>:{{
+                    review['like'] }}</p>
+                <p class="card-sction">분야: {{ review['studyOption'] }}</p>
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+</div>
+
+
+</body>
+</html>
