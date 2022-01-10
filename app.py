@@ -23,6 +23,7 @@ if (db.number.find_one({"id": 'autoIncrement'}) is None):
 
 @app.route('/sign_up/check_dup', methods=['POST'])
 def check_dup():
+    # 유저 닉네임 중복확인
     username_receive = request.form['username_give']
     exists = bool(db.users.find_one({"username": username_receive}))
     return jsonify({'result': 'success', 'exists': exists})
@@ -30,32 +31,39 @@ def check_dup():
 
 @app.route('/')
 def home():
+    # /로 들어왔을 때 조건에 따라 구현
     review_list = list(db.reviews.find({}, {'_id': False}))
     print(review_list)
     token_receive = request.cookies.get('mytoken')
+    # 토큰이 있고 만료되지 않았으면 리뷰리스트 나열
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
         user_info = db.users.find_one({"username": payload["id"]})
         return render_template('reviews.html', user_info=user_info, review_list=review_list)
+    # 토큰이 있으나 시간 만료 되었을떄
     except jwt.ExpiredSignatureError:
         return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
+    # 토큰이 없음
     except jwt.exceptions.DecodeError:
         return redirect(url_for("login", msg="로그인 정보가 존재하지 않습니다."))
 
 
 @app.route('/guest')
 def guest():
+    # 게스트로 입장한다면 -> 기능 구현 필요 def home()에 추가해야함
     return render_template("reviews.html")
 
 
 @app.route('/login')
 def login():
+    #로그인 페이지로 들어왔을때 렌더링
     msg = request.args.get("msg")
     return render_template('login.html', msg=msg)
 
 
 @app.route('/sign_up/save', methods=['POST'])
 def sign_up():
+    # 회원 가입 기능 구현 ajax로 아이디 패스워드를 받아서 패스워드를 해시화한 후 db에 저장
     username_receive = request.form['username_give']
     password_receive = request.form['password_give']
     password_hash = hashlib.sha256(password_receive.encode('utf-8')).hexdigest()
@@ -71,13 +79,13 @@ def sign_up():
 
 @app.route('/sign_in', methods=['POST'])
 def sign_in():
-    # 로그인
+    # 로그인 기능 구현
     username_receive = request.form['username_give']
     password_receive = request.form['password_give']
 
     pw_hash = hashlib.sha256(password_receive.encode('utf-8')).hexdigest()
     result = db.users.find_one({'username': username_receive, 'password': pw_hash})
-
+    # 로그인과 동시에 토큰 발급 캐시로 포함되어 넘어감
     if result is not None:
         payload = {
             'id': username_receive,
@@ -93,6 +101,7 @@ def sign_in():
 
 @app.route('/review', methods=['POST'])
 def saving():
+    # 리뷰글을 디비에 저장하는 과정, 리뷰글을 누가 작성했는지 유저 디비에 저장
     special_number = db.number.find_one({'id' : 'autoIncrement'})['number']
     token_receive = request.cookies.get('mytoken')
     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
@@ -122,7 +131,7 @@ def saving():
 
 @app.route('/mypage')
 def user():
-    # 각 사용자의 프로필과 글을 모아볼 수 있는 공간
+    # 각 사용자의 리뷰글 추천글 회원 정보를 볼 수 있는 페이지
     token_receive = request.cookies.get('mytoken')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
@@ -133,6 +142,7 @@ def user():
 
 @app.route('/reviews/like', methods=['POST'])
 def update_like():
+    # 좋아요 기능 구현 누가 좋아요를 했는지 유저 디비에 저장
     token_receive = request.cookies.get('mytoken')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
@@ -152,6 +162,7 @@ def update_like():
 
 @app.route('/reviews/section')
 def review_filter():
+    # 분류화 기능 추가 작업 필요
     print(request.form['section_list'])
 
 if __name__ == '__main__':
