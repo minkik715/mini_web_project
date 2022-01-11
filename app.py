@@ -17,6 +17,8 @@ SECRET_KEY = 'STUDYWITH'
 
 client = MongoClient('localhost', 27017)
 db = client.DO_STUDY
+
+# autoIncrement 를  위해 서버가 꺼져도 변하지 않는 디비에 리뷰의 number 값을 저장
 if (db.number.find_one({"id": 'autoIncrement'}) is None):
     db.number.insert_one({"number": 1, "id": 'autoIncrement'})
 
@@ -49,8 +51,7 @@ def check_dup():
 def home():
     # /로 들어왔을 때 조건에 따라 구현
     review_list = list(db.reviews.find({}, {'_id': False}))
-    return  return_list(review_list)
-
+    return return_list(review_list)
 
 
 @app.route('/guest')
@@ -153,16 +154,15 @@ def user():
 
 @app.route('/reviews/like', methods=['POST'])
 def update_like():
-
     token_receive = request.cookies.get('mytoken')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
         number_receive = int(request.form['number_give'])
-    # 좋아요 기능 구현
+        # 좋아요 기능 구현
         review = db.reviews.find_one({'special_number': number_receive})
         like = review['like'] + 1
         db.reviews.update_one({'special_number': number_receive}, {'$set': {'like': like}})
-    # 유저디비 리뷰리스트에 리뷰 넣기
+        # 유저디비 리뷰리스트에 리뷰 넣기
         like_list = list(db.users.find_one({'username': payload['id']})['like_list'])
         like_list.append(number_receive);
         my_set = set(like_list)
@@ -178,7 +178,10 @@ def review_filter():
     # 쿼리로 데이터 값 받아와서 옵션으로 리스트 분류화
     option = request.args.get('option')
     print(option)
-    selected_reviews = list(db.reviews.find({"studyOption" : option}))
+    if (option == 'All'):
+        selected_reviews = list(db.reviews.find({}))
+    else:
+        selected_reviews = list(db.reviews.find({"studyOption": option}))
     for selected_review in selected_reviews:
         print(selected_review)
     return return_list(selected_reviews)
