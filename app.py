@@ -169,7 +169,7 @@ def update_like():
 
 @app.route('/reviews/section', methods=["GET"])
 def review_filter():
-    # 분류화 기능 추가 작업 필요
+    # 쿼리로 데이터 값 받아와서 옵션으로 리스트 분류화
     option = request.args.get('option')
     print(option)
     selected_reviews = list(db.reviews.find({"studyOption" : option}))
