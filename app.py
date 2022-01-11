@@ -147,7 +147,16 @@ def user():
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
         user_info = db.users.find_one({"username": payload["id"]})
-        return render_template('mypage.html', user_info=user_info)
+        like_num_set = user_info['like_list']
+        review_num_set = user_info['review_list']
+        like_list = []
+        review_list = []
+        for num in like_num_set:
+            like_list.append(db.reviews.find_one({'special_number': num}))
+        for num in review_num_set:
+            review_list.append(db.reviews.find_one({'special_number' : num}))
+
+        return render_template('mypage.html', user_info=user_info, like_list=like_list, review_list=review_list)
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
 
@@ -201,3 +210,4 @@ def search():
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
+

@@ -8,6 +8,7 @@ function postArticle() {
         url: "/reviews",
         data: {url_give: url, comment_give: comment, studyOption_give: studyOption},
         success: function (response) { // 성공하면
+            alert("리뷰 작성 완료")
             window.location.reload();
         }
     })
