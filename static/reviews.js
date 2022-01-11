@@ -5,10 +5,9 @@ function postArticle() {
     console.log(studyOption);
     $.ajax({
         type: "POST",
-        url: "/review",
+        url: "/reviews",
         data: {url_give: url, comment_give: comment, studyOption_give: studyOption},
         success: function (response) { // 성공하면
-            alert(response["msg"]);
             window.location.reload();
         }
     })
@@ -33,11 +32,25 @@ function likeReview(number) {
     });
 }
 
-function checkSection(){
-    let check_section = []
-    $("input[name=studyOption]:checked").each(function (){
-        check_section.push($(this).val());
-    })
+let option = "None";
+
+function filter() {
+    let new_filter = ($("select[name=studyOption]").val());
+
+    if (option == new_filter) {
+        return;
+    } else {
+        option = new_filter;
+        console.log(option)
+        $.ajax({
+            type: 'GET',
+            url: `/reviews/section?option=${option}`,
+            data: {},
+            success: function (response) {
+                window.location.href = `/reviews/section?option=${option}`
+            }
+        });
+    }
 
 
 }

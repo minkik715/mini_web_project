@@ -3,7 +3,7 @@
 <head>
 
     <!-- Webpage Title -->
-    <title>Home | SWEETER</title>
+    <title>공부헤윰</title>
 
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -14,12 +14,16 @@
     <!-- Font Awesome CSS -->
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
+
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
           crossorigin="anonymous">
     <!-- JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+          integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
 
     <link href="{{ url_for('static', filename='reviews.css') }}" rel="stylesheet">
     <script src="../static/reviews.js"></script>
@@ -56,6 +60,7 @@
                 <input class="form-check-input" type="radio" name="studyOption" id="inlineRadio1" value="Spring">
                 <label class="form-check-label" for="inlineRadio1">Spring</label>
             </div>
+
             <div class="form-check form-check-inline">
                 <input class="form-check-input" type="radio" name="studyOption" id="inlineRadio2" value="Node.js">
                 <label class="form-check-label" for="inlineRadio2">Node.js</label>
@@ -68,34 +73,36 @@
                 <input class="form-check-input" type="radio" name="studyOption" id="inlineRadio4" value="Etc">
                 <label class="form-check-label" for="inlineRadio4">Etc</label>
             </div>
-            <button type="button" class="btn btn-primary" onclick="postArticle()">포스팅하기</button>
+            <button type="button" class="btn btn-primary posting-btn" onclick="postArticle()">포스팅하기</button>
         </div>
 
 
     </div>
+
     <div class="section">
+        <form action="/reviews">
+            <input type="text" name="search" value="">
+            <input type="submit" value="검색">
+        </form>
         <p>
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" name="studyOption" id="inlineCheckbox1" value="Spring">
-            <label class="form-check-label" for="inlineCheckbox1">Spring</label>
+        <div>
+            <select name="studyOption" onclick="filter()">
+                <option value="None">None</option>
+                <option value="React">React</option>
+                <option value="Node.js">Node.js</option>
+                <option value="Spring">Spring</option>
+                <option value="Etc">Etc</option>
+            </select>
         </div>
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" name="studyOption" id="inlineCheckbox2" value="Node.js">
-            <label class="form-check-label" for="inlineCheckbox2">Node.js</label>
-        </div>
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" name="studyOption" id="inlineCheckbox3" value="React">
-            <label class="form-check-label" for="inlineCheckbox3">React</label>
-        </div>
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" name="studyOption" id="inlineCheckbox4" value="Etc">
-            <label class="form-check-label" for="inlineCheckbox4">Etc</label>
+        <div id="output">
         </div>
         </p>
+
+
     </div>
     <div id="cards-box" class="card-columns">
         {% for review in review_list %}
-        <div class="card">
+        <div class="card" }}>
 
             <img class="card-img-top"
                  src={{ review['image'] }}

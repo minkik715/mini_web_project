@@ -21,6 +21,22 @@ if (db.number.find_one({"id": 'autoIncrement'}) is None):
     db.number.insert_one({"number": 1, "id": 'autoIncrement'})
 
 
+def return_list(list):
+    token_receive = request.cookies.get('mytoken')
+    print(list)
+    # 토큰이 있고 만료되지 않았으면 리뷰리스트 나열
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user_info = db.users.find_one({"username": payload["id"]})
+        return render_template('reviews.html', user_info=user_info, review_list=list)
+    # 토큰이 있으나 시간 만료 되었을떄
+    except jwt.ExpiredSignatureError:
+        return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
+    # 토큰이 없음
+    except jwt.exceptions.DecodeError:
+        return redirect(url_for("login", msg="로그인 정보가 존재하지 않습니다."))
+
+
 @app.route('/sign_up/check_dup', methods=['POST'])
 def check_dup():
     # 유저 닉네임 중복확인
@@ -33,19 +49,8 @@ def check_dup():
 def home():
     # /로 들어왔을 때 조건에 따라 구현
     review_list = list(db.reviews.find({}, {'_id': False}))
-    print(review_list)
-    token_receive = request.cookies.get('mytoken')
-    # 토큰이 있고 만료되지 않았으면 리뷰리스트 나열
-    try:
-        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-        user_info = db.users.find_one({"username": payload["id"]})
-        return render_template('reviews.html', user_info=user_info, review_list=review_list)
-    # 토큰이 있으나 시간 만료 되었을떄
-    except jwt.ExpiredSignatureError:
-        return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
-    # 토큰이 없음
-    except jwt.exceptions.DecodeError:
-        return redirect(url_for("login", msg="로그인 정보가 존재하지 않습니다."))
+    return  return_list(review_list)
+
 
 
 @app.route('/guest')
@@ -56,7 +61,7 @@ def guest():
 
 @app.route('/login')
 def login():
-    #로그인 페이지로 들어왔을때 렌더링
+    # 로그인 페이지로 들어왔을때 렌더링
     msg = request.args.get("msg")
     return render_template('login.html', msg=msg)
 
@@ -99,10 +104,10 @@ def sign_in():
         return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
 
 
-@app.route('/review', methods=['POST'])
+@app.route('/reviews', methods=['POST'])
 def saving():
     # 리뷰글을 디비에 저장하는 과정, 리뷰글을 누가 작성했는지 유저 디비에 저장
-    special_number = db.number.find_one({'id' : 'autoIncrement'})['number']
+    special_number = db.number.find_one({'id': 'autoIncrement'})['number']
     token_receive = request.cookies.get('mytoken')
     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
     review_list = list(db.users.find_one({'username': payload['id']})['review_list'])
@@ -140,6 +145,7 @@ def user():
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
 
+
 @app.route('/reviews/like', methods=['POST'])
 def update_like():
     # 좋아요 기능 구현 누가 좋아요를 했는지 유저 디비에 저장
@@ -160,10 +166,28 @@ def update_like():
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
 
-@app.route('/reviews/section')
+
+@app.route('/reviews/section', methods=["GET"])
 def review_filter():
     # 분류화 기능 추가 작업 필요
-    print(request.form['section_list'])
+    option = request.args.get('option')
+    print(option)
+    selected_reviews = list(db.reviews.find({"studyOption" : option}))
+    for selected_review in selected_reviews:
+        print(selected_review)
+    return return_list(selected_reviews)
+
+
+@app.route('/reviews')
+def search():
+    search = request.args.get('search')
+    reviews = list(db.reviews.find({}, {'_id': False}))
+    review_list = []
+    for review in reviews:
+        if (search in review['title'] or search in review['comment'] or search in review['desc']):
+            review_list.append(review)
+    return return_list(review_list)
+
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
