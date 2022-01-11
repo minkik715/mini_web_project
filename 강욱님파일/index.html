@@ -1,0 +1,240 @@
+<!Doctype html>
+<html lang="ko">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+
+    <!-- 구글폰트 -->
+    <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet">
+
+    <!-- Bulma CSS 링크 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+
+    <link href="{{ url_for('static', filename='mystyle.css') }}" rel="stylesheet">
+
+    <title>11조 | 공부혜윰</title>
+
+    <!-- style -->
+    <style>
+        * {
+            font-family: "Stylish", sans-serif;
+        }
+
+        .wrap {
+            width: 900px;
+            margin: auto;
+        }
+
+
+        #post-box {
+            width: 220px;
+            margin: 20px, 0px;
+            padding: 20px;
+            border: black solid;
+            border-radius: 5px;
+        }
+
+        .mybtn {
+            margin: 0px 10px;
+        }
+
+    </style>
+    <script>
+
+        $(document).ready(function () {
+            showArticles();
+        });
+
+        function openClose() {
+            if ($("#post-box").css("display") == "block") {
+                $("#post-box").hide();
+                $("#btn-post-box").text("회원정보 열기");
+            } else {
+                $("#post-box").show();
+                $("#btn-post-box").text("회원정보 닫기");
+            }
+        }
+
+
+        function postArticle() {
+            let url = $('#post-url').val()
+            let comment = $('#post-comment').val()
+            let type = $('#post-type')
+
+            $.ajax({
+                type: "POST",
+                url: "/reviews/search",
+                data: {url_give: url, comment_give: comment, type_give: type},
+                success: function (response) { // 성공하면
+                    alert(response["msg"]);
+                    window.location.reload()
+                }
+            })
+        }
+
+
+        // function showArticles() {
+        //     $.ajax({
+        //         type: "GET",
+        //         url: "/memo",
+        //         data: {},
+        //         success: function (response) {
+        //             let articles = response['all_articles']
+        //             for (let i = 0; i < articles.length; i++) {
+        //                 let title = articles[i]['title']
+        //                 let image = articles[i]['image']
+        //                 let url = articles[i]['url']
+        //                 let desc = articles[i]['desc']
+        //                 let comment = articles[i]['comment']
+        //
+        //                 let temp_html = `<div class="card">
+        //                                         <img class="card-img-top"
+        //                                              src="${image}"
+        //                                              alt="Card image cap">
+        //                                         <div class="card-body">
+        //                                             <a target="_blank" href="${url}" class="card-title">${title}</a>
+        //                                             <p class="card-text">${desc}</p>
+        //                                             <p class="card-text comment">${comment}</p>
+        //                                             <button type="button" onclick="del('${title}')" class="btn btn-secondary btn-sm">삭제하기</button>
+        //                                         </div>
+        //                                     </div>`
+        //                 $('#cards-box').append(temp_html)
+        //             }
+        //         }
+        //     })
+        // }
+
+
+    </script>
+
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top is-white" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="/">
+            <img src="{{ url_for('static', filename='logo.png') }}">
+            <strong class="is-sparta"
+                    style="font-family: 'Stylish', sans-serif;font-size: small;"> 메인페이지로 이동</strong>
+        </a>
+    </div>
+</nav>
+
+<div class="wrap">
+    <div class="jumbotron">
+        <h1 class="display-2">My page</h1>
+        <hr class="my-10">
+        <p class="lead">자신의 회원정보 및 추천했던 영상을 볼 수 있습니다</p>
+    </div>
+
+
+    <div class="form-post">
+        <div>
+            <div class="form-group">
+                <label for="post-url">유튜브 URL</label>
+                <input id="post-url" class="form-control" placeholder="">
+            </div>
+            <div class="form-group">
+                <label for="post-comment">간단 리뷰</label>
+                <textarea id="post-comment" class="form-control" rows="2"></textarea>
+                <div id="post-type">
+                    <label><input type="radio" name="type" value="Spring"> Spring</label>
+                    <label><input type="radio" name="type" value="Node.js"> Node.js</label>
+                    <label><input type="radio" name="type" value="React"> React</label>
+                    <label><input type="radio" name="type" value="Etc"> Etc</label>
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="postArticle()">업로드</button>
+        </div>
+    </div>
+    <br>
+    <p class="lead">
+        <button onclick="openClose()" id="btn-post-box" type="button" class="btn btn-primary">회원정보 열기</button>
+    <div id="post-box" class="form-post" style="display:none">
+        <p class="mybtn">내 아이디 : </p>
+    </div>
+    </p>
+    <hr class="my-10">
+    <p class="lead">내가 추천한 영상</p>
+
+    <div id="cards-box" class="card-columns">
+        <div class="card">
+            <img class="card-img-top"
+                 src="https://www.eurail.com/content/dam/images/eurail/Italy%20OCP%20Promo%20Block.adaptive.767.1535627244182.jpg"
+                 alt="Card image cap">
+            <div class="card-body">
+                <a href="http://naver.com/">제목</a>
+                <p class="card-text">내용</p>
+                <p class="card-text mytitle">코멘트</p>
+            </div>
+        </div>
+        <div class="card">
+            <img class="card-img-top"
+                 src="https://www.eurail.com/content/dam/images/eurail/Italy%20OCP%20Promo%20Block.adaptive.767.1535627244182.jpg"
+                 alt="Card image cap">
+            <div class="card-body">
+                <a href="http://naver.com/">제목</a>
+                <p class="card-text">내용</p>
+                <p class="card-text mytitle">코멘트</p>
+            </div>
+        </div>
+        <div class="card">
+            <img class="card-img-top"
+                 src="https://www.eurail.com/content/dam/images/eurail/Italy%20OCP%20Promo%20Block.adaptive.767.1535627244182.jpg"
+                 alt="Card image cap">
+            <div class="card-body">
+                <a href="http://naver.com/">제목</a>
+                <p class="card-text">내용</p>
+                <p class="card-text mytitle">코멘트</p>
+            </div>
+        </div>
+        <div class="card">
+            <img class="card-img-top"
+                 src="https://www.eurail.com/content/dam/images/eurail/Italy%20OCP%20Promo%20Block.adaptive.767.1535627244182.jpg"
+                 alt="Card image cap">
+            <div class="card-body">
+                <a href="http://naver.com/">제목</a>
+                <p class="card-text">내용</p>
+                <p class="card-text mytitle">코멘트</p>
+            </div>
+        </div>
+        <div class="card">
+            <img class="card-img-top"
+                 src="https://www.eurail.com/content/dam/images/eurail/Italy%20OCP%20Promo%20Block.adaptive.767.1535627244182.jpg"
+                 alt="Card image cap">
+            <div class="card-body">
+                <a href="http://naver.com/">제목</a>
+                <p class="card-text">내용</p>
+                <p class="card-text mytitle">코멘트</p>
+            </div>
+        </div>
+        <div class="card">
+            <img class="card-img-top"
+                 src="https://www.eurail.com/content/dam/images/eurail/Italy%20OCP%20Promo%20Block.adaptive.767.1535627244182.jpg"
+                 alt="Card image cap">
+            <div class="card-body">
+                <a href="http://naver.com/">제목</a>
+                <p class="card-text">내용</p>
+                <p class="card-text mytitle">코멘트</p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>
