@@ -106,7 +106,7 @@ def sign_in():
 
 @app.route('/reviews', methods=['POST'])
 def saving():
-    # 리뷰글을 디비에 저장하는 과정, 리뷰글을 누가 작성했는지 유저 디비에 저장
+    # 리뷰글을 누가 작성했는지 유저 디비에 저장
     special_number = db.number.find_one({'id': 'autoIncrement'})['number']
     token_receive = request.cookies.get('mytoken')
     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
@@ -115,6 +115,9 @@ def saving():
     my_set = set(review_list)
     review_list = list(my_set)
     db.users.update_one({'username': payload['id']}, {'$set': {'review_list': review_list}})
+
+    # 크롤링 한 데이터를 리뷰 디비에 저장
+    # 예지님 구현
     url_receive = request.form['url_give']
     comment_receive = request.form['comment_give']
     studyOption_receive = request.form['studyOption_give']
@@ -129,6 +132,7 @@ def saving():
     doc = {'title': title, 'desc': desc, 'image': image, 'url': url, 'comment': comment_receive,
            'studyOption': studyOption_receive, 'like': 0, 'special_number': special_number}
     db.reviews.insert_one(doc)
+    # Auto Increment
     special_number += 1
     db.number.update_one({'id': 'autoIncrement'}, {'$set': {'number': special_number}})
     return redirect('/')
@@ -137,6 +141,7 @@ def saving():
 @app.route('/mypage')
 def user():
     # 각 사용자의 리뷰글 추천글 회원 정보를 볼 수 있는 페이지
+    # 강욱님 구현
     token_receive = request.cookies.get('mytoken')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
@@ -148,15 +153,16 @@ def user():
 
 @app.route('/reviews/like', methods=['POST'])
 def update_like():
-    # 좋아요 기능 구현 누가 좋아요를 했는지 유저 디비에 저장
+
     token_receive = request.cookies.get('mytoken')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
         number_receive = int(request.form['number_give'])
-
+    # 좋아요 기능 구현
         review = db.reviews.find_one({'special_number': number_receive})
         like = review['like'] + 1
         db.reviews.update_one({'special_number': number_receive}, {'$set': {'like': like}})
+    # 유저디비 리뷰리스트에 리뷰 넣기
         like_list = list(db.users.find_one({'username': payload['id']})['like_list'])
         like_list.append(number_receive);
         my_set = set(like_list)
@@ -180,6 +186,7 @@ def review_filter():
 
 @app.route('/reviews')
 def search():
+    # 쿼리로 데이터 값 받아와서 리스트 검색
     search = request.args.get('search')
     reviews = list(db.reviews.find({}, {'_id': False}))
     review_list = []
