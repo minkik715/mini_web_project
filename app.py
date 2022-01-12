@@ -58,6 +58,7 @@ def login():
 
 @app.route('/sign_up/save', methods=['POST'])
 def sign_up():
+    # 유저객체를 생성했으면 더 쉽게 구현가능
     # 회원 가입 기능 구현 ajax로 아이디 패스워드를 받아서 패스워드를 해시화한 후 db에 저장
     username_receive = request.form['username_give']
     password_receive = request.form['password_give']
@@ -116,6 +117,8 @@ def saving():
     studyOption_receive = request.form['studyOption_give']
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
+
+    # 리뷰라는 객체를 만들었으면 db에 쌓이는게 훨씬 간단하게 들어갔을 것임
     data = requests.get(url_receive, headers=headers)
     soup = BeautifulSoup(data.text, 'html.parser')
     title = soup.select_one('meta[property="og:title"]')['content']
