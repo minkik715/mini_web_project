@@ -54,9 +54,6 @@
     </style>
     <script>
 
-        $(document).ready(function () {
-            showArticles();
-        });
 
         function openClose() {
             if ($("#post-box").css("display") == "block") {
@@ -139,7 +136,7 @@
     <div class="jumbotron">
         <h1 class="display-2">My page</h1>
         <hr class="my-10">
-        <p class="lead">자신의 회원정보 및 추천했던 영상을 볼 수 있습니다</p>
+        <p class="lead">자신의 회원정보 및 추천했던 리뷰를 볼 수 있습니다</p>
     </div>
 
 
@@ -170,7 +167,7 @@
     </div>
     </p>
     <hr class="my-10">
-    <p class="lead">내가 추천한 영상</p>
+    <p class="lead">내가 추천한 리뷰</p>
 
     <div id="cards-box" class="card-columns">
         {% for like in like_list %}
@@ -195,7 +192,7 @@
 
     <br>
     <hr class="my-10">
-    <p class="lead">내가 리뷰한 영상</p>
+    <p class="lead">나의 리뷰</p>
 
     <div id="cards-box2" class="card-columns">
          {% for review in review_list %}

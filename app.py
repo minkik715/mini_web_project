@@ -23,20 +23,6 @@ if (db.number.find_one({"id": 'autoIncrement'}) is None):
     db.number.insert_one({"number": 1, "id": 'autoIncrement'})
 
 
-def return_list(list):
-    token_receive = request.cookies.get('mytoken')
-    print(list)
-    # 토큰이 있고 만료되지 않았으면 리뷰리스트 나열
-    try:
-        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-        user_info = db.users.find_one({"username": payload["id"]})
-        return render_template('reviews.html', user_info=user_info, review_list=list)
-    # 토큰이 있으나 시간 만료 되었을떄
-    except jwt.ExpiredSignatureError:
-        return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
-    # 토큰이 없음
-    except jwt.exceptions.DecodeError:
-        return redirect(url_for("login", msg="로그인 정보가 존재하지 않습니다."))
 
 
 @app.route('/sign_up/check_dup', methods=['POST'])
@@ -51,18 +37,21 @@ def check_dup():
 def home():
     # /로 들어왔을 때 조건에 따라 구현
     review_list = list(db.reviews.find({}, {'_id': False}))
-    return return_list(review_list)
+    return render_template('reviews.html', review_list=review_list)
+
 
 
 @app.route('/guest')
 def guest():
     # 게스트로 입장한다면 -> 기능 구현 필요 def home()에 추가해야함
-    return render_template("reviews.html")
+    review_list = list(db.reviews.find({}))
+    return render_template("reviews.html", review_list=review_list)
 
 
 @app.route('/login')
 def login():
     # 로그인 페이지로 들어왔을때 렌더링
+    # 쿼리에 올라가 있는 msg 값
     msg = request.args.get("msg")
     return render_template('login.html', msg=msg)
 
@@ -92,6 +81,8 @@ def sign_in():
     pw_hash = hashlib.sha256(password_receive.encode('utf-8')).hexdigest()
     result = db.users.find_one({'username': username_receive, 'password': pw_hash})
     # 로그인과 동시에 토큰 발급 캐시로 포함되어 넘어감
+
+    # db에 아이디와 패스워드가 맞아서 result 값이 있다면
     if result is not None:
         payload = {
             'id': username_receive,
@@ -105,7 +96,7 @@ def sign_in():
         return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
 
 
-@app.route('/reviews', methods=['POST'])
+@app.route('/', methods=['POST'])
 def saving():
     # 리뷰글을 누가 작성했는지 유저 디비에 저장
     special_number = db.number.find_one({'id': 'autoIncrement'})['number']
@@ -113,6 +104,7 @@ def saving():
     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
     review_list = list(db.users.find_one({'username': payload['id']})['review_list'])
     review_list.append(special_number);
+    # set을 통해 중복 제거
     my_set = set(review_list)
     review_list = list(my_set)
     db.users.update_one({'username': payload['id']}, {'$set': {'review_list': review_list}})
@@ -171,7 +163,7 @@ def update_like():
         review = db.reviews.find_one({'special_number': number_receive})
         like = review['like'] + 1
         db.reviews.update_one({'special_number': number_receive}, {'$set': {'like': like}})
-        # 유저디비 리뷰리스트에 리뷰 넣기
+        # 유저디비 좋아요 리스트에 리뷰 넣기
         like_list = list(db.users.find_one({'username': payload['id']})['like_list'])
         like_list.append(number_receive);
         my_set = set(like_list)
@@ -193,7 +185,8 @@ def review_filter():
         selected_reviews = list(db.reviews.find({"studyOption": option}))
     for selected_review in selected_reviews:
         print(selected_review)
-    return return_list(selected_reviews)
+    return render_template('reviews.html', review_list=selected_reviews)
+
 
 
 @app.route('/reviews')
@@ -205,7 +198,7 @@ def search():
     for review in reviews:
         if (search in review['title'] or search in review['comment'] or search in review['desc']):
             review_list.append(review)
-    return return_list(review_list)
+    return render_template('reviews.html', review_list=review_list)
 
 
 if __name__ == '__main__':
