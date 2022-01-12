@@ -138,6 +138,34 @@ def saving():
     db.number.update_one({'id': 'autoIncrement'}, {'$set': {'number': special_number}})
     return redirect('/')
 
+# @app.route('/reviews', methods=['POST'])
+# def saving():
+#     url_receive = request.form['url_give']
+#     comment_receive = request.form['comment_give']
+#     type_receive = request.form['type_give']
+#
+#     headers = {
+#         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
+#     data = requests.get(url_receive, headers=headers)
+#
+#     soup = BeautifulSoup(data.text, 'html.parser')
+#
+#     title = soup.select_one('meta[property="og:title"]')['content']
+#     icon = soup.select_one('meta[property="og:image"]')['content']
+#     desc = soup.select_one('meta[property="og:description"]')['content']
+#
+#     doc = {
+#         'title': title,
+#         'icon': icon,
+#         'desc': desc,
+#         'url':url_receive,
+#         'comment':comment_receive,
+#         'type':type_receive
+#     }
+#     db.study.insert_one(doc)
+#
+#     return jsonify({'msg':'저장'})
+
 
 @app.route('/mypage')
 def user():
