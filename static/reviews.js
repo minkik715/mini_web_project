@@ -33,6 +33,13 @@ function postArticle() {
     }
 
 }
+function gologin(){
+    if (getCookie('mytoken') != null){
+        alert("이미 로그인이 되어있습니다,")
+    }else{
+        window.location.href='/login'
+    }
+}
 
 function getCookie(cookieName) {
     var cookieValue = null;

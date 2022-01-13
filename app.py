@@ -15,7 +15,8 @@ app.config['UPLOAD_FOLDER'] = "./static/profile_pics"
 
 SECRET_KEY = 'STUDYWITH'
 
-client = MongoClient('mongodb://test:test@localhost', 27017)
+#client = MongoClient('mongodb://test:test@localhost', 27017)
+client = MongoClient('localhost', 27017)
 db = client.DO_STUDY
 
 # autoIncrement 를  위해 서버가 꺼져도 변하지 않는 디비에 리뷰의 number 값을 저장
